@@ -26,12 +26,9 @@ class BaseModel(ABC):
         ...
 
     @abstractmethod
+    def print_results(self) -> None:
+        ...
+
+    @abstractmethod
     def data_transform(self) -> None:
         return
-
-    # def build(self, values) -> BaseModel:
-    def build(self, values={}):
-        values = values if isinstance(values, dict) else utils.string2any(values)
-        self.__dict__.update(self.defaults)
-        self.__dict__.update(values)
-        return self

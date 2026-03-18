@@ -1,0 +1,18 @@
+======================================================================
+MULTI-MODEL COMPARISON RESULTS
+Baseline Type 2 Classification
+======================================================================
+
+Dataset: 161 train, 41 test samples
+Classes: 3
+
+Model                     Accuracy        Training Time (s)   
+----------------------------------------------------------------------
+RandomForest              0.7805 (78.05%)        3.03
+Support Vector Machine    0.8780 (87.80%)        0.45
+Logistic Regression       0.0000 ( 0.00%)        0.00
+Gradient Boosting         0.7805 (78.05%)        9.38
+
+======================================================================
+BEST MODEL: Support Vector Machine with 0.8780 accuracy
+======================================================================
