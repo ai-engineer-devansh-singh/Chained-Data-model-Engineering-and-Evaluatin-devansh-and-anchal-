@@ -7,6 +7,7 @@ from modelling.chained_data_model import ChainedData
 from model.chained import ChainedClassifier
 import random
 import numpy as np
+import argparse
 
 seed = 0
 random.seed(seed)
@@ -41,10 +42,10 @@ def get_chained_data_object(X: np.ndarray, df: pd.DataFrame):
     return ChainedData(X, df)
 
 
-def perform_chained_modelling(chained_data: ChainedData):
+def perform_chained_modelling(chained_data: ChainedData, model_name: str):
     """Train and evaluate chained classifier"""
     # Create chained classifier
-    model = ChainedClassifier(model_name='ChainedRandomForest')
+    model = ChainedClassifier(model_name=model_name)
     
     # Train all three levels
     model.train(chained_data)
@@ -58,9 +59,20 @@ def perform_chained_modelling(chained_data: ChainedData):
 
 # Code will start executing from following line
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Run chained multi-label classification')
+    parser.add_argument(
+        '--model',
+        type=str,
+        default='randomforest',
+        choices=['randomforest', 'svm', 'logistic', 'gradientboost'],
+        help='Base model used at each chain level'
+    )
+    args = parser.parse_args()
+
     print("="*70)
     print("DESIGN DECISION 1: CHAINED MULTI-OUTPUT CLASSIFICATION")
     print("="*70)
+    print(f"Selected chain base model: {args.model}")
     
     # Pre-processing steps
     df = load_data()
@@ -75,7 +87,7 @@ if __name__ == '__main__':
     chained_data = get_chained_data_object(X, df)
     
     # Perform chained multi-label modelling
-    perform_chained_modelling(chained_data)
+    perform_chained_modelling(chained_data, args.model)
     
     print("\n" + "="*70)
     print("CHAINED CLASSIFICATION COMPLETE")

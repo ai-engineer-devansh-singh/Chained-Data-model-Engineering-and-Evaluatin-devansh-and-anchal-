@@ -2,6 +2,9 @@ import numpy as np
 import pandas as pd
 from model.base import BaseModel
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 import random
 
@@ -22,16 +25,51 @@ class ChainedClassifier(BaseModel):
     def __init__(self, model_name: str) -> None:
         super(ChainedClassifier, self).__init__()
         self.model_name = model_name
-        
-        # Three RandomForest models for three chain levels
-        self.model_l1 = RandomForestClassifier(n_estimators=1000, random_state=seed, class_weight='balanced_subsample')
-        self.model_l2 = RandomForestClassifier(n_estimators=1000, random_state=seed, class_weight='balanced_subsample')
-        self.model_l3 = RandomForestClassifier(n_estimators=1000, random_state=seed, class_weight='balanced_subsample')
+
+        # Three identical base estimators for three chain levels
+        self.model_l1 = self._create_model()
+        self.model_l2 = self._create_model()
+        self.model_l3 = self._create_model()
         
         # Predictions storage
         self.predictions_l1 = None
         self.predictions_l2 = None
         self.predictions_l3 = None
+
+    def _create_model(self):
+        """Create the underlying estimator based on selected model_name."""
+        model_key = self.model_name.lower().strip()
+
+        if model_key in ["chainedrandomforest", "randomforest", "rf"]:
+            return RandomForestClassifier(
+                n_estimators=1000,
+                random_state=seed,
+                class_weight='balanced_subsample'
+            )
+
+        if model_key in ["svm", "chainedsvm"]:
+            return SVC(kernel='rbf', C=1.0, random_state=seed, probability=True)
+
+        if model_key in ["logistic", "logisticregression", "chainedlogistic"]:
+            return LogisticRegression(
+                max_iter=1000,
+                random_state=seed,
+                solver='lbfgs',
+                multi_class='multinomial'
+            )
+
+        if model_key in ["gradientboost", "gradientboosting", "chainedgradientboost"]:
+            return GradientBoostingClassifier(
+                n_estimators=100,
+                learning_rate=0.1,
+                max_depth=5,
+                random_state=seed
+            )
+
+        raise ValueError(
+            f"Unsupported chain model '{self.model_name}'. "
+            "Use one of: randomforest, svm, logistic, gradientboost"
+        )
     
     def train(self, chained_data) -> None:
         """
